@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Side Media | Social Content Production Agency</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#07070a',
+                            card: '#12121a',
+                            accent: '#6366f1',
+                            accentGlow: '#4f46e5',
+                            tiktok: '#00f2fe',
+                            youtube: '#ff0000',
+                            snapchat: '#fffc00',
+                            facebook: '#1877f2'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07070a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f1f2e;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2e2e42;
+        }
+        
+        /* Smooth visual reveal styles */
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+        .reveal-element.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .glow-hover:hover {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-brand-bg text-zinc-100 font-sans min-h-screen relative overflow-x-hidden">
+
+    <!-- Glowing top scroll tracker line -->
+    <div id="scroll-progress" class="fixed top-0 left-0 h-1 bg-gradient-to-r from-brand-tiktok via-brand-accent to-brand-youtube z-[1001] w-0 transition-all duration-75"></div>
+
+    <!-- APP WRAPPER: Contains Editor Sidebar & Website Preview -->
+    <div class="flex flex-col lg:flex-row min-h-screen">
+
+        <!-- ==========================================
+             LEFT: LIVE SETUP ASSISTANT (ADMIN CONTROL)
+             ========================================== -->
+        <aside id="setup-assistant" class="w-full lg:w-[420px] bg-zinc-950 border-b lg:border-b-0 lg:border-r border-zinc-900 p-6 flex flex-col gap-6 shrink-0 z-50">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></span>
+                    <h2 class="text-sm font-black text-white tracking-wider uppercase">SSM Admin Station</h2>
+                </div>
+                <button onclick="toggleAssistant()" class="lg:hidden text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded hover:bg-zinc-800">
+                    Hide Menu
+                </button>
+            </div>
+
+            <p class="text-[11px] text-zinc-500 -mt-3 leading-relaxed">
+                Configure your media metrics, showcase custom edits, or publish articles. Watch edits propagate instantly across your scrolling layout.
+            </p>
+
+            <!-- Navigation Tabs for Editor -->
+            <div class="flex border-b border-zinc-900 text-xs">
+                <button onclick="switchTab('tab-profile')" id="btn-tab-profile" class="flex-1 py-2 text-center border-b-2 border-brand-accent text-white font-semibold">Branding</button>
+                <button onclick="switchTab('tab-stats')" id="btn-tab-stats" class="flex-1 py-2 text-center border-b-2 border-transparent text-zinc-500 hover:text-white">Metrics</button>
+                <button onclick="switchTab('tab-work')" id="btn-tab-work" class="flex-1 py-2 text-center border-b-2 border-transparent text-zinc-500 hover:text-white font-medium">Showcase</button>
+                <button onclick="switchTab('tab-articles')" id="btn-tab-articles" class="flex-1 py-2 text-center border-b-2 border-transparent text-zinc-500 hover:text-white font-medium">Blog Writer</button>
+            </div>
+
+            <!-- Tab Content: Profile Customizer -->
+            <div id="tab-profile" class="editor-tab flex flex-col gap-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Company Branding Name</label>
+                    <input type="text" id="input-company-name" value="Scroll Side Media" oninput="updateProfile()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-brand-accent outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Target Booking Inbox</label>
+                    <input type="email" id="input-email" value="scrollsidemedia@gmail.com" oninput="updateProfile()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-brand-accent outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Hero Pitch Headline</label>
+                    <textarea id="input-hero-title" rows="2" oninput="updateProfile()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-brand-accent outline-none resize-none">We Make Videos People Actually Scroll To Watch</textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Core Pitch Intro</label>
+                    <textarea id="input-hero-desc" rows="4" oninput="updateProfile()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs text-zinc-400 focus:border-brand-accent outline-none">Content crafted to catch eyes and keep people watching. Premium video editing, custom static graphic designs, and strategic platform management tailored for YouTube, TikTok, Snapchat, and Facebook growth.</textarea>
+                </div>
+            </div>
+
+            <!-- Tab Content: Metrics Customizer -->
+            <div id="tab-stats" class="editor-tab hidden flex flex-col gap-4">
+                <p class="text-[11px] text-zinc-500 leading-relaxed mb-1">Update the dynamic statistics that flash on screen as clients scroll through your site.</p>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Statistic #1 (Total Views)</label>
+                    <input type="text" id="stat-views" value="150M+" oninput="updateStats()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-brand-accent outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Statistic #2 (Completed Edits)</label>
+                    <input type="text" id="stat-edits" value="450+" oninput="updateStats()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-brand-accent outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Statistic #3 (Audience Retention)</label>
+                    <input type="text" id="stat-retention" value="98%" oninput="updateStats()" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-brand-accent outline-none">
+                </div>
+            </div>
+
+            <!-- Tab Content: Work & Showcase Manager -->
+            <div id="tab-work" class="editor-tab hidden flex flex-col gap-4">
+                <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
+                    <h3 class="text-xs font-bold text-brand-accent uppercase tracking-wider mb-3">Add / Edit a Client Project</h3>
+                    
+                    <div class="flex flex-col gap-3">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-zinc-500 uppercase mb-1">Target Platform</label>
+                            <select id="work-platform" class="w-full bg-zinc-950 border border-zinc-800 rounded p-2 text-xs text-white outline-none">
+                                <option value="TikTok">TikTok (Vertical Video)</option>
+                                <option value="YouTube">YouTube (Horizontal / Short)</option>
+                                <option value="Snapchat">Snapchat (Vertical / Spotlight)</option>
+                                <option value="Facebook">Facebook (Square / Editorial)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-zinc-500 uppercase mb-1">Project Title</label>
+                            <input type="text" id="work-title" placeholder="e.g., Viral Retention Edit" class="w-full bg-zinc-950 border border-zinc-800 rounded p-2 text-xs text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-zinc-500 uppercase mb-1">Project Description</label>
+                            <input type="text" id="work-desc" placeholder="e.g., Kept audience hooked with modern fast cuts." class="w-full bg-zinc-950 border border-zinc-800 rounded p-2 text-xs text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-zinc-500 uppercase mb-1">Media Format Color</label>
+                            <select id="work-color" class="w-full bg-zinc-950 border border-zinc-800 rounded p-2 text-xs text-white outline-none">
+                                <option value="indigo">Purple Slate</option>
+                                <option value="rose">Cinematic Red</option>
+                                <option value="cyan">Neon Cyan</option>
+                                <option value="amber">Warm Gold</option>
+                            </select>
+                        </div>
+                        <button onclick="addProject()" class="w-full bg-brand-accent hover:bg-brand-accentGlow text-white text-xs font-semibold py-2 rounded-lg transition-all">
+                            Publish To Showcase
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Blog Writer -->
+            <div id="tab-articles" class="editor-tab hidden flex flex-col gap-4">
+                <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
+                    <h3 class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-3">Write an Article</h3>
+                    
+                    <div class="flex flex-col gap-3">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-zinc-500 uppercase mb-1">Article Category</label>
+                            <input type="text" id="article-category" value="Media Strategy" class="w-full bg-zinc-950 border border-zinc-800 rounded p-2 text-xs text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-zinc-500 uppercase mb-1">Title</label>
+                            <input type="text" id="article-title" placeholder="e.g., Crucial Hooks for TikTok edits" class="w-full bg-zinc-950 border border-zinc-800 rounded p-2 text-xs text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-semibold text-zinc-500 uppercase mb-1">Article Body Content</label>
+                            <textarea id="article-body" rows="4" placeholder="Type your knowledge or news here..." class="w-full bg-zinc-950 border border-zinc-800 rounded p-2 text-xs text-white outline-none resize-none"></textarea>
+                        </div>
+                        <button onclick="publishArticle()" class="w-full bg-pink-500 hover:bg-pink-600 text-white text-xs font-semibold py-2 rounded-lg transition-all">
+                            Publish Article Live
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assistant Status Footer -->
+            <div class="mt-auto pt-4 border-t border-zinc-900 text-center">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400">
+                    <span>Mode:</span>
+                    <span class="text-indigo-400 font-bold">Immersive Sandbox</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Toggle Assistant Trigger (Floating Button on mobile) -->
+        <button id="floating-toggle-btn" onclick="toggleAssistant()" class="fixed bottom-4 right-4 z-50 bg-zinc-900 border border-zinc-700 hover:bg-zinc-800 text-white p-3 rounded-full shadow-2xl lg:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+            </svg>
+        </button>
+
+
+        <!-- ==========================================
+             RIGHT: REAL LIVE WEBSITE PREVIEW
+             ========================================== -->
+        <main class="flex-1 relative flex flex-col h-screen overflow-y-auto bg-brand-bg" id="preview-main">
+
+            <!-- Website Navigation Bar -->
+            <nav class="sticky top-0 bg-brand-bg/90 backdrop-blur-md border-b border-zinc-900/80 z-40">
+                <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl font-black bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent tracking-tighter cursor-pointer" id="logo-render">
+                            Scroll Side Media
+                        </span>
+                    </div>
+                    <!-- Quick scrolling anchor links -->
+                    <div class="hidden md:flex items-center gap-8 text-xs font-semibold text-zinc-400">
+                        <a href="#home-section" class="hover:text-white transition-colors">Home</a>
+                        <a href="#stats-section" class="hover:text-white transition-colors">Metrics</a>
+                        <a href="#platforms-section" class="hover:text-white transition-colors">Platforms</a>
+                        <a href="#process-section" class="hover:text-white transition-colors">The Process</a>
+                        <a href="#showcase-section" class="hover:text-white transition-colors">Showcase</a>
+                        <a href="#services-section" class="hover:text-white transition-colors">Services</a>
+                        <a href="#blog-section" class="hover:text-white transition-colors">Blog</a>
+                        <a href="#connect-section" class="bg-brand-accent hover:bg-brand-accentGlow text-white px-4 py-2 rounded-lg transition-all text-[11px] glow-hover">Connect</a>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Hero Section -->
+            <section id="home-section" class="relative max-w-6xl mx-auto px-6 pt-24 pb-32 flex flex-col items-center text-center">
+                <!-- Glowing effect background -->
+                <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-accent/15 rounded-full blur-[120px] pointer-events-none"></div>
+
+                <div class="inline-flex items-center gap-2 bg-brand-accent/10 border border-brand-accent/20 px-3.5 py-1.5 rounded-full text-xs text-indigo-400 font-bold mb-8 animate-pulse">
+                    <span>✨</span> Next-Generation Video Edits & Visual Design
+                </div>
+
+                <h1 id="hero-title-render" class="text-4xl sm:text-6xl font-black tracking-tight max-w-4xl leading-[1.15] mb-6 bg-gradient-to-b from-white via-zinc-100 to-zinc-400 bg-clip-text text-transparent">
+                    We Make Videos People Actually Scroll To Watch
+                </h1>
+
+                <p id="hero-desc-render" class="text-zinc-400 text-base sm:text-lg max-w-2xl mb-12 leading-relaxed">
+                    Content crafted to catch eyes and keep people watching. Premium video editing, custom static graphic designs, and strategic platform management tailored for YouTube, TikTok, Snapchat, and Facebook growth.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#showcase-section" class="bg-brand-accent hover:bg-brand-accentGlow text-white px-8 py-3 rounded-xl font-bold transition-all text-xs glow-hover">
+                        View Client Showcase
+                    </a>
+                    <a href="#process-section" class="bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 px-8 py-3 rounded-xl font-bold transition-all text-xs">
+                        Our Scroll Process
+                    </a>
+                </div>
+
+                <!-- Scrolling Down Arrow Indicator -->
+                <div class="mt-20 flex flex-col items-center gap-2 text-zinc-600 animate-bounce">
+                    <span class="text-[10px] tracking-widest uppercase font-black">Scroll Down to Explore</span>
+                    <span class="text-base">↓</span>
+                </div>
+            </section>
+
+            <!-- Custom Divider -->
+            <div class="border-t border-zinc-900/80"></div>
+
+            <!-- NEW SECTION: Dynamic Statistics Metrics (Scroll Activated) -->
+            <section id="stats-section" class="max-w-6xl mx-auto px-6 py-20 w-full reveal-element">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div class="bg-brand-card/30 border border-zinc-800/40 rounded-2xl p-8 backdrop-blur-sm relative overflow-hidden group hover:border-zinc-700/60 transition-all">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-tiktok to-brand-accent"></div>
+                        <div class="text-xs uppercase tracking-widest text-zinc-500 font-bold mb-2">Social Views Driven</div>
+                        <h2 class="text-5xl font-black text-white tracking-tight mb-2 scale-stat" id="render-stat-views">150M+</h2>
+                        <p class="text-xs text-zinc-400 leading-relaxed">High-impact retention editing designed to loop users indefinitely.</p>
+                    </div>
+
+                    <div class="bg-brand-card/30 border border-zinc-800/40 rounded-2xl p-8 backdrop-blur-sm relative overflow-hidden group hover:border-zinc-700/60 transition-all">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-accent to-pink-500"></div>
+                        <div class="text-xs uppercase tracking-widest text-zinc-500 font-bold mb-2">Edits Delivered</div>
+                        <h2 class="text-5xl font-black text-white tracking-tight mb-2 scale-stat" id="render-stat-edits">450+</h2>
+                        <p class="text-xs text-zinc-400 leading-relaxed">Flawless, multi-format delivery with 24-hour creative turnaround times.</p>
+                    </div>
+
+                    <div class="bg-brand-card/30 border border-zinc-800/40 rounded-2xl p-8 backdrop-blur-sm relative overflow-hidden group hover:border-zinc-700/60 transition-all">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 to-brand-youtube"></div>
+                        <div class="text-xs uppercase tracking-widest text-zinc-500 font-bold mb-2">Average Audience Retention</div>
+                        <h2 class="text-5xl font-black text-white tracking-tight mb-2 scale-stat" id="render-stat-retention">98%</h2>
+                        <p class="text-xs text-zinc-400 leading-relaxed">Visual pacing structured strictly around first 3-second attention hooks.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Custom Divider -->
+            <div class="border-t border-zinc-900/80"></div>
+
+            <!-- Platform Specific Optimizations Section -->
+            <section id="platforms-section" class="max-w-6xl mx-auto px-6 py-24 reveal-element">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <h2 class="text-2xl sm:text-3xl font-black text-white mb-4">Dedicated Platform Specialization</h2>
+                    <p class="text-zinc-400 text-sm">Every social channel runs on a different algorithm hook. We modify every edit timeline to maximize organic audience velocity.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- TikTok Card -->
+                    <div class="bg-brand-card border border-zinc-800/40 p-6 rounded-2xl relative overflow-hidden group hover:border-zinc-700/60 transition-all">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-tiktok/5 rounded-full blur-2xl group-hover:bg-brand-tiktok/10 transition-all"></div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="p-2 rounded-lg bg-zinc-900 text-brand-tiktok font-black text-base">🍿</span>
+                            <h3 class="font-bold text-base text-white">TikTok (9:16 Feed Strategy)</h3>
+                        </div>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Ultra-fast split-screen cuts, synchronized animated sub-captions, and instant sound design triggers in under 1.5 seconds.
+                        </p>
+                    </div>
+
+                    <!-- YouTube Card -->
+                    <div class="bg-brand-card border border-zinc-800/40 p-6 rounded-2xl relative overflow-hidden group hover:border-zinc-700/60 transition-all">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-youtube/5 rounded-full blur-2xl group-hover:bg-brand-youtube/10 transition-all"></div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="p-2 rounded-lg bg-zinc-900 text-brand-youtube font-black text-base">🎬</span>
+                            <h3 class="font-bold text-base text-white">YouTube & Shorts Integration</h3>
+                        </div>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Narrative storytelling structure, tactical zoom cuts, soundscapes, and customized high-conversion static layouts.
+                        </p>
+                    </div>
+
+                    <!-- Snapchat Card -->
+                    <div class="bg-brand-card border border-zinc-800/40 p-6 rounded-2xl relative overflow-hidden group hover:border-zinc-700/60 transition-all">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-snapchat/5 rounded-full blur-2xl group-hover:bg-brand-snapchat/10 transition-all"></div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="p-2 rounded-lg bg-zinc-900 text-brand-snapchat font-black text-base">⚡</span>
+                            <h3 class="font-bold text-base text-white">Snapchat Spotlight Deployment</h3>
+                        </div>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Vibrant color grading overrides and loud pattern interrupts to capture mobile users as they swipe through spotlight categories.
+                        </p>
+                    </div>
+
+                    <!-- Facebook Card -->
+                    <div class="bg-brand-card border border-zinc-800/40 p-6 rounded-2xl relative overflow-hidden group hover:border-zinc-700/60 transition-all">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-facebook/5 rounded-full blur-2xl group-hover:bg-brand-facebook/10 transition-all"></div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="p-2 rounded-lg bg-zinc-900 text-brand-facebook font-black text-base">👥</span>
+                            <h3 class="font-bold text-base text-white">Facebook Square Formatting</h3>
+                        </div>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Muted autoplay optimization. Custom square grids (1:1 ratio) with permanent subtitle tracking for users browsing timeline feeds silently.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Custom Divider -->
+            <div class="border-t border-zinc-900/80"></div>
+
+            <!-- NEW SECTION: Interactive Vertical "Scroll Process" Timeline -->
+            <section id="process-section" class="max-w-6xl mx-auto px-6 py-24 reveal-element">
+                <div class="text-center max-w-2xl mx-auto mb-20">
+                    <span class="text-[10px] tracking-widest uppercase font-black text-brand-accent">Workflow Engine</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white mt-1 mb-4">The Scroll Side Production Pipeline</h2>
+                    <p class="text-zinc-400 text-sm">How we convert raw media assets into high-converting client retention streams step-by-step.</p>
+                </div>
+
+                <!-- Timeline wrapper line -->
+                <div class="relative max-w-3xl mx-auto border-l border-zinc-800">
+                    
+                    <!-- Step 1 -->
+                    <div class="mb-12 ml-6 relative group">
+                        <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-brand-tiktok border border-zinc-900 group-hover:scale-125 transition-transform duration-300"></div>
+                        <span class="text-[10px] font-bold text-brand-tiktok tracking-wider uppercase">Phase 01</span>
+                        <h3 class="font-bold text-lg text-white mt-0.5 mb-2">Asset Drop & Script Ingestion</h3>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Drop raw logs or camera footage into our dedicated folder dashboard. We run script reviews to locate key attention peaks.
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="mb-12 ml-6 relative group">
+                        <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-brand-accent border border-zinc-900 group-hover:scale-125 transition-transform duration-300"></div>
+                        <span class="text-[10px] font-bold text-brand-accent tracking-wider uppercase">Phase 02</span>
+                        <h3 class="font-bold text-lg text-white mt-0.5 mb-2">Pacing & retention Cut</h3>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Our editing team designs structural pattern interrupts every 1.5 seconds. We burn responsive subtitle graphics directly into mobile positions.
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="mb-12 ml-6 relative group">
+                        <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-brand-youtube border border-zinc-900 group-hover:scale-125 transition-transform duration-300"></div>
+                        <span class="text-[10px] font-bold text-brand-youtube tracking-wider uppercase">Phase 03</span>
+                        <h3 class="font-bold text-lg text-white mt-0.5 mb-2">Static Design Suite</h3>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Integration of custom thumbnail layouts, banner overlays, and high-CTR typography styles to make sure assets stand out on feed grids.
+                        </p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="ml-6 relative group">
+                        <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-emerald-400 border border-zinc-900 group-hover:scale-125 transition-transform duration-300"></div>
+                        <span class="text-[10px] font-bold text-emerald-400 tracking-wider uppercase">Phase 04</span>
+                        <h3 class="font-bold text-lg text-white mt-0.5 mb-2">Deploy & Optimize</h3>
+                        <p class="text-zinc-400 text-xs leading-relaxed">
+                            Final deployment in pristine high-resolution formats. We track audience engagement ratios and adjust visual templates continuously.
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Custom Divider -->
+            <div class="border-t border-zinc-900/80"></div>
+
+            <!-- Client Showcase (Portfolio) Section -->
+            <section id="showcase-section" class="max-w-6xl mx-auto px-6 py-24 reveal-element">
+                <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white">Client Showcase & Assets</h2>
+                        <p class="text-zinc-400 text-sm mt-1">Select from our deployed video styles. Click any thumbnail below to preview pacing templates.</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex gap-2">
+                        <button onclick="filterShowcase('all')" class="showcase-filter-btn px-3.5 py-1.5 rounded-lg bg-zinc-800 text-xs font-semibold text-white">All</button>
+                        <button onclick="filterShowcase('TikTok')" class="showcase-filter-btn px-3.5 py-1.5 rounded-lg bg-zinc-900/60 text-xs font-semibold text-zinc-400 hover:text-white">TikTok</button>
+                        <button onclick="filterShowcase('YouTube')" class="showcase-filter-btn px-3.5 py-1.5 rounded-lg bg-zinc-900/60 text-xs font-semibold text-zinc-400 hover:text-white">YouTube</button>
+                    </div>
+                </div>
+
+                <!-- Live-Rendering Showcase Grid -->
+                <div id="showcase-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Default Card 1 -->
+                    <div class="portfolio-item-card bg-brand-card border border-zinc-800/40 rounded-2xl overflow-hidden group hover:border-zinc-700/60 transition-all" data-platform="TikTok">
+                        <div class="relative h-80 bg-gradient-to-br from-indigo-950 to-zinc-950 flex flex-col justify-between p-6">
+                            <span class="self-start text-[10px] font-bold tracking-wider uppercase bg-[#00f2fe]/20 text-[#00f2fe] border border-[#00f2fe]/30 px-2 py-0.5 rounded">TikTok</span>
+                            <button onclick="simulatePlay('Viral TikTok Retainer')" class="mx-auto w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20 hover:scale-110 transition-transform">
+                                <span class="ml-1 text-sm">▶</span>
+                            </button>
+                            <span class="text-xs text-zinc-500">Pacing Index: 9.8s Ret.</span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="font-bold text-white mb-1">Viral Retention Concept</h3>
+                            <p class="text-xs text-zinc-400">Dynamic transitions and split-screen asset arrays engineered specifically for quick swipe hooks.</p>
+                        </div>
+                    </div>
+
+                    <!-- Default Card 2 -->
+                    <div class="portfolio-item-card bg-brand-card border border-zinc-800/40 rounded-2xl overflow-hidden group hover:border-zinc-700/60 transition-all" data-platform="YouTube">
+                        <div class="relative h-80 bg-gradient-to-br from-zinc-950 to-rose-950 flex flex-col justify-between p-6">
+                            <span class="self-start text-[10px] font-bold tracking-wider uppercase bg-[#ff0000]/20 text-[#ff0000] border border-[#ff0000]/30 px-2 py-0.5 rounded">YouTube</span>
+                            <button onclick="simulatePlay('Premium Cinematic YouTube Feature')" class="mx-auto w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20 hover:scale-110 transition-transform">
+                                <span class="ml-1 text-sm">▶</span>
+                            </button>
+                            <span class="text-xs text-zinc-500">Duration: 12m Overview</span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="font-bold text-white mb-1">Narrative Documentary Edit</h3>
+                            <p class="text-xs text-zinc-400">Color-graded timeline optimization tailored for long-form educational & narrative creators.</p>
+                        </div>
+                    </div>
+
+                    <!-- Default Card 3 -->
+                    <div class="portfolio-item-card bg-brand-card border border-zinc-800/40 rounded-2xl overflow-hidden group hover:border-zinc-700/60 transition-all" data-platform="Snapchat">
+                        <div class="relative h-80 bg-gradient-to-br from-amber-950 to-zinc-950 flex flex-col justify-between p-6">
+                            <span class="self-start text-[10px] font-bold tracking-wider uppercase bg-[#fffc00]/20 text-[#fffc00] border border-[#fffc00]/30 px-2 py-0.5 rounded">Snapchat</span>
+                            <button onclick="simulatePlay('Snapchat Spotlight Dynamic Pack')" class="mx-auto w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20 hover:scale-110 transition-transform">
+                                <span class="ml-1 text-sm">▶</span>
+                            </button>
+                            <span class="text-xs text-zinc-500">Filter Overlay Active</span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="font-bold text-white mb-1">Instant Reaction Format</h3>
+                            <p class="text-xs text-zinc-400">Vibrant color grades and sound effects engineered directly to trigger high social interactions.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Custom Divider -->
+            <div class="border-t border-zinc-900/80"></div>
+
+            <!-- NEW SERVICES SECTION: Detailed Platform Breakdown -->
+            <section id="services-section" class="max-w-6xl mx-auto px-6 py-24 reveal-element">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <span class="text-xs font-semibold uppercase tracking-widest text-brand-accent">Channel Growth Suite</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white mt-1 mb-4">Our Services</h2>
+                    <p class="text-zinc-400 text-sm">We help brands and creators grow their presence across every major platform with high-quality, scroll-stopping content tailored to each channel's unique style and audience.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- 1. Facebook Content Creation -->
+                    <div class="bg-brand-card border border-zinc-800/40 p-8 rounded-2xl hover:border-brand-facebook/40 transition-all group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-facebook/5 rounded-full blur-2xl group-hover:bg-brand-facebook/10 transition-all"></div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="w-10 h-10 rounded-xl bg-brand-facebook/10 flex items-center justify-center text-brand-facebook font-bold">👥</span>
+                            <h3 class="font-bold text-lg text-white">1. Facebook Content Creation</h3>
+                        </div>
+                        <p class="text-zinc-400 text-xs mb-6 leading-relaxed">We craft compelling Facebook content designed to boost engagement and reach:</p>
+                        <ul class="space-y-4 text-xs text-zinc-300">
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-facebook font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Custom Images</strong>
+                                    <span class="text-zinc-500 text-[11px]">Eye-catching graphics and visual posts tailored to your brand.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-facebook font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Reels</strong>
+                                    <span class="text-zinc-500 text-[11px]">Trend-aware, engaging short-form video content optimized for the Facebook algorithm.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-facebook font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Static Posts</strong>
+                                    <span class="text-zinc-500 text-[11px]">Professionally designed posts that communicate your message clearly and effectively.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 2. YouTube Content Production -->
+                    <div class="bg-brand-card border border-zinc-800/40 p-8 rounded-2xl hover:border-brand-youtube/40 transition-all group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-youtube/5 rounded-full blur-2xl group-hover:bg-brand-youtube/10 transition-all"></div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="w-10 h-10 rounded-xl bg-brand-youtube/10 flex items-center justify-center text-brand-youtube font-bold">🎬</span>
+                            <h3 class="font-bold text-lg text-white">2. YouTube Content Production</h3>
+                        </div>
+                        <p class="text-zinc-400 text-xs mb-6 leading-relaxed">Complete YouTube content solutions to help your channel grow:</p>
+                        <ul class="space-y-4 text-xs text-zinc-300">
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-youtube font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Custom Thumbnails</strong>
+                                    <span class="text-zinc-500 text-[11px]">Click-worthy, high-converting thumbnail designs.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-youtube font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Long-Form Videos</strong>
+                                    <span class="text-zinc-500 text-[11px]">Full video editing and production for in-depth content.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-youtube font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Shorts</strong>
+                                    <span class="text-zinc-500 text-[11px]">Punchy, attention-grabbing short videos built for maximum reach.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 3. Snapchat Content -->
+                    <div class="bg-brand-card border border-zinc-800/40 p-8 rounded-2xl hover:border-brand-snapchat/40 transition-all group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-snapchat/5 rounded-full blur-2xl group-hover:bg-brand-snapchat/10 transition-all"></div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="w-10 h-10 rounded-xl bg-brand-snapchat/10 flex items-center justify-center text-brand-snapchat font-bold">⚡</span>
+                            <h3 class="font-bold text-lg text-white">3. Snapchat Content</h3>
+                        </div>
+                        <p class="text-zinc-400 text-xs mb-6 leading-relaxed">Dynamic Snapchat content built to keep your audience engaged:</p>
+                        <ul class="space-y-4 text-xs text-zinc-300">
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-snapchat font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Snapchat Stories</strong>
+                                    <span class="text-zinc-500 text-[11px]">Creative, on-brand story content.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-snapchat font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Video Edits</strong>
+                                    <span class="text-zinc-500 text-[11px]">Polished, fast-paced edits suited for Snapchat's format.</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-snapchat font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Additional Video Content</strong>
+                                    <span class="text-zinc-500 text-[11px]">Custom video solutions tailored to your goals.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 4. TikTok Video Creation -->
+                    <div class="bg-brand-card border border-zinc-800/40 p-8 rounded-2xl hover:border-brand-tiktok/40 transition-all group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-brand-tiktok/5 rounded-full blur-2xl group-hover:bg-brand-tiktok/10 transition-all"></div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="w-10 h-10 rounded-xl bg-brand-tiktok/10 flex items-center justify-center text-brand-tiktok font-bold">🍿</span>
+                            <h3 class="font-bold text-lg text-white">4. TikTok Video Creation</h3>
+                        </div>
+                        <p class="text-zinc-400 text-xs mb-6 leading-relaxed">Trend-driven TikTok videos designed to go viral:</p>
+                        <ul class="space-y-4 text-xs text-zinc-300">
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-brand-tiktok font-bold">✓</span>
+                                <div>
+                                    <strong class="text-white block">Custom TikTok Videos</strong>
+                                    <span class="text-zinc-500 text-[11px]">Engaging, platform-optimized content crafted to capture attention and drive growth.</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Custom Divider -->
+            <div class="border-t border-zinc-900/80"></div>
+
+            <!-- Articles & Insights (Blog) Section -->
+            <section id="blog-section" class="max-w-6xl mx-auto px-6 py-24 bg-zinc-950/40 rounded-3xl my-10 border border-zinc-900/50 reveal-element">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <span class="text-xs font-semibold uppercase tracking-widest text-brand-accent">Scroll Side Knowledge Base</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white mt-2">Articles & Insights</h2>
+                    <p class="text-zinc-400 text-sm mt-2">Explore strategic analyses of digital culture, cinematic formulas, and monetization models.</p>
+                </div>
+
+                <!-- Articles Grid Container -->
+                <div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Default Article 1 -->
+                    <div class="article-element p-6 rounded-2xl border border-zinc-800/60 bg-brand-bg/50 hover:border-brand-accent/30 transition-all cursor-pointer" onclick="openArticleModal('The Anatomy of a Viral Narrative', 'An in-depth breakdown of how pacing, script hooks, and color selection interact to capture user attention in the first three seconds of a scroll. To keep viewers, your hook must contain visual shifts every 1.5 seconds. For static elements, vibrant borders perform 40% better on Snapchat spotlights compared to plain backgrounds. We focus strictly on the conversion rate of impressions to active viewership.')">
+                        <span class="text-[10px] text-brand-accent font-bold tracking-widest uppercase">VIRAL PSYCHOLOGY</span>
+                        <h3 class="font-bold text-lg text-white mt-2 mb-3">The Anatomy of a Viral Narrative</h3>
+                        <p class="text-xs text-zinc-400 leading-relaxed line-clamp-3">
+                            An in-depth breakdown of how pacing, script hooks, and color selection interact to capture user attention in the first three seconds of a scroll...
+                        </p>
+                        <span class="inline-block mt-4 text-xs font-semibold text-zinc-300">Read Entire Article →</span>
+                    </div>
+
+                    <!-- Default Article 2 -->
+                    <div class="article-element p-6 rounded-2xl border border-zinc-800/60 bg-brand-bg/50 hover:border-brand-accent/30 transition-all cursor-pointer" onclick="openArticleModal('Why Retro Aesthetics are Dominating Modern Content', 'Exploring the sensory psychology behind nostalgia and how brands can leverage classic cinematic layouts to build deep consumer trust. In the age of ultra-saturated digital feeds, muted vintage colors act as a pattern interrupt. Clients watching retro-graded edits show an average of
